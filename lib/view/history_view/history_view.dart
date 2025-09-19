@@ -1,0 +1,215 @@
+import 'package:ai_text_summrizer/utils/components/app_colors.dart';
+import 'package:ai_text_summrizer/utils/components/app_images.dart';
+import 'package:ai_text_summrizer/utils/fonts/app_fonts.dart';
+import 'package:ai_text_summrizer/view/history_view/widgets/horizontal_chip.dart';
+import 'package:ai_text_summrizer/view/input_view/input_screen_view.dart';
+import 'package:ai_text_summrizer/view/pro_screen/pro_screen1.dart';
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+
+class HistoryScreenView extends StatefulWidget {
+  const HistoryScreenView({super.key});
+
+  @override
+  State<HistoryScreenView> createState() => _HistoryScreenViewState();
+}
+
+class _HistoryScreenViewState extends State<HistoryScreenView> {
+  int _currentIndex = 0;
+
+  final List<Map<String, dynamic>> features = [
+    {
+      "icon": AppImages.ai_summarizer,
+      "title": "Summarized Content",
+      "subtitle":
+          "Nature is the most precious gift that surrounds us, offering life, beauty, and balance to everything on Earth. From the tall...",
+    },
+    {
+      "icon": AppImages.aiParaphraser,
+      "title": "Paraphrased Content",
+      "subtitle":
+          "Nature is the most precious gift that surrounds us, offering life, beauty, and balance to everything on Earth. From the tall...",
+    },
+    {
+      "icon": AppImages.ai_humanizer,
+      "title": "Humanized content",
+      "subtitle":
+          "Nature is the most precious gift that surrounds us, offering life, beauty, and balance to everything on Earth. From the tall...",
+    },
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Appcolor.backgroundColor,
+
+      /// APP BAR LIKE TOP BANNER
+      body: SafeArea(
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              /// Top Banner with Gradient
+              ///
+              Stack(
+                children: [
+                  Container(
+                    height: Get.height * 0.25,
+                    width: double.infinity,
+                    color: Colors.white, // tumhara background
+                    child: Transform.translate(
+                      offset: const Offset(
+                        130,
+                        -50,
+                      ), // x=right shift, y=up shift
+                      child: Image.asset(
+                        AppImages.homeScgif,
+                        height: 300,
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.only(top: Get.height * 0.22),
+                    child: HorizontalSelector(),
+                  ),
+                  Positioned(
+                    top: Get.height * 0.04,
+                    left: 20,
+                    child: GestureDetector(
+                      onTap: () {
+                        Get.to(() => ProScreen());
+                      },
+                      child: Container(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 15,
+                          vertical: 8,
+                        ),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(20),
+                          gradient: LinearGradient(
+                            colors: [Color(0xffB425E2), Color(0xffE8888D)],
+                          ),
+                        ),
+                        child: Image.asset(AppImages.pro, height: 18),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+
+                  Padding(
+                    padding: EdgeInsets.only(top: Get.height * 0.26),
+                    child: ListView.builder(
+                      padding: const EdgeInsets.all(16),
+                      itemCount: features.length,
+                      shrinkWrap: true,
+                      physics: NeverScrollableScrollPhysics(),
+                      itemBuilder: (context, index) {
+                        final item = features[index];
+
+                        // Gradient direction alternate hoga
+                        final Alignment begin =
+                            index.isEven
+                                ? Alignment.centerLeft
+                                : Alignment.centerRight;
+                        final Alignment end =
+                            index.isEven
+                                ? Alignment.centerRight
+                                : Alignment.centerLeft;
+
+                        return GestureDetector(
+                          onTap: () {},
+                          child: Container(
+                            margin: const EdgeInsets.only(top: 8),
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                colors: [
+                                  Appcolor.themeColor.withOpacity(0.4),
+                                  Colors.transparent,
+                                ],
+                                begin: begin,
+                                end: end,
+                              ),
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                            child: Container(
+                              padding: EdgeInsets.symmetric(vertical: 5),
+                              margin: const EdgeInsets.all(
+                                1.5,
+                              ), // border thickness
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(14),
+                              ),
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 8.0,
+                                  horizontal: 10,
+                                ),
+                                child: Column(
+                                  children: [
+                                    Row(
+                                      children: [
+                                        Icon(
+                                          Icons.circle,
+                                          size: 10,
+                                          color: Appcolor.themeColor
+                                              .withOpacity(0.8),
+                                        ),
+                                        SizedBox(width: 10),
+                                        Text(
+                                          item['title'],
+                                          style: TextStyle(
+                                            fontSize: 13,
+                                            fontFamily: AppFonts.roboto,
+                                            color: Appcolor.themeColor,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    SizedBox(height: 10),
+                                    Container(
+                                      height: 1,
+                                      width: double.infinity,
+                                      color: Color(0xffEFEFEF),
+                                    ),
+                                    SizedBox(height: 10),
+                                    Text(
+                                      item['subtitle'],
+                                      style: TextStyle(
+                                        fontSize: 13,
+                                        color: Color(0xff1E1E1E),
+                                        fontFamily: AppFonts.roboto,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                  Positioned(
+                    top: Get.height * 0.12,
+                    left: 20,
+                    child: Text(
+                      "Explore all \nhistory",
+                      style: const TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        // color: Colors.white,
+                        height: 1.3,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
