@@ -1,18 +1,69 @@
 import 'dart:async';
+import 'dart:developer';
 import 'package:ai_text_summrizer/utils/components/app_colors.dart';
 import 'package:ai_text_summrizer/utils/components/app_images.dart';
 import 'package:ai_text_summrizer/utils/fonts/app_fonts.dart';
+import 'package:ai_text_summrizer/view_model/api_request_tool_controller/api_request_tool_controller.dart';
+import 'package:ai_text_summrizer/view_model/home_controller/home_controller.dart';
 import 'package:ai_text_summrizer/view_model/loading_controller/loading_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-class LoadingScreen extends StatelessWidget {
-  const LoadingScreen({super.key});
+class LoadingScreen extends StatefulWidget {
+  LoadingScreen({super.key});
+
+  @override
+  State<LoadingScreen> createState() => _LoadingScreenState();
+}
+
+class _LoadingScreenState extends State<LoadingScreen> {
+  final controller = Get.put(LoadingController());
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+
+    /// Step tick animation
+    Future.delayed(const Duration(milliseconds: 500), () async {
+      for (int i = 0; i < controller.steps.length; i++) {
+        await Future.delayed(const Duration(seconds: 1));
+        controller.currentStep.value = i + 1;
+      }
+
+      /// Navigate after all steps
+      await Future.delayed(const Duration(seconds: 1));
+      //  Get.find<SummarizerController>().summarize(text)
+      if (Get.find<HomeController>().toolName.value == "AI Summarizer") {
+        Get.find<ApiToolController>().summarize(
+          Get.find<ApiToolController>().inputTextcontroller.text.toString(),
+          0,
+        );
+        log('its index is ${Get.find<HomeController>().toolName.value} 0');
+      } else if (Get.find<HomeController>().toolName.value ==
+          "AI Paraphraser") {
+        Get.find<ApiToolController>().summarize(
+          Get.find<ApiToolController>().inputTextcontroller.text.toString(),
+          1,
+        );
+        log('its index is ${Get.find<HomeController>().toolName.value} 1');
+      } else if (Get.find<HomeController>().toolName.value == "AI Humanizer") {
+        log('its index is ${Get.find<HomeController>().toolName.value} 2');
+        Get.find<ApiToolController>().summarize(
+          Get.find<ApiToolController>().inputTextcontroller.text.toString(),
+          2,
+        );
+      }
+    });
+
+    /// Animate dots in "It..."
+    Timer.periodic(const Duration(milliseconds: 500), (timer) {
+      controller.dotCount.value =
+          (controller.dotCount.value % 3) + 1; // 1 → 2 → 3 → loop
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-    final controller = Get.put(LoadingController());
-
     return Scaffold(
       backgroundColor: Colors.white,
       body: Center(

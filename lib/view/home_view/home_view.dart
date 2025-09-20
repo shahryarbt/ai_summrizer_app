@@ -3,6 +3,7 @@ import 'package:ai_text_summrizer/utils/components/app_images.dart';
 import 'package:ai_text_summrizer/utils/fonts/app_fonts.dart';
 import 'package:ai_text_summrizer/view/input_view/input_screen_view.dart';
 import 'package:ai_text_summrizer/view/pro_screen/pro_screen1.dart';
+import 'package:ai_text_summrizer/view_model/api_request_tool_controller/api_request_tool_controller.dart';
 import 'package:ai_text_summrizer/view_model/home_controller/home_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -15,7 +16,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  HomeController _homeController = Get.put(HomeController());
+  ApiToolController _aihumnazierController = Get.put(ApiToolController());
   final List<Map<String, dynamic>> features = [
     {
       "icon": AppImages.ai_summarizer,
@@ -158,7 +159,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                 size: 16,
                               ),
                               onTap: () {
-                                Get.to(() => AiHumanizerScreen());
+                                Get.find<HomeController>().toolName.value =
+                                    item["title"];
+                                Get.to(() => InputScreen());
                               },
                             ),
                           ),

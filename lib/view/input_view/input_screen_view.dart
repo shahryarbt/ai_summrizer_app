@@ -1,41 +1,47 @@
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:ai_text_summrizer/utils/components/app_colors.dart';
 import 'package:ai_text_summrizer/utils/components/app_images.dart';
 import 'package:ai_text_summrizer/utils/fonts/app_fonts.dart';
 import 'package:ai_text_summrizer/view/loading_view/loading_screen.dart';
-import 'package:ai_text_summrizer/view/result_view/result_view_screen.dart';
+import 'package:ai_text_summrizer/view_model/api_request_tool_controller/api_request_tool_controller.dart';
+import 'package:ai_text_summrizer/view_model/home_controller/home_controller.dart';
+import 'package:ai_text_summrizer/view_model/result_controller/result_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 
-class AiHumanizerController extends GetxController {
-  var text = ''.obs;
-}
+// class AiHumanizerController extends GetxController {
+//   var text = ''.obs;
+// }
 
-class AiHumanizerScreen extends StatefulWidget {
-  AiHumanizerScreen({super.key});
+class InputScreen extends StatefulWidget {
+  InputScreen({super.key});
 
   @override
-  State<AiHumanizerScreen> createState() => _AiHumanizerScreenState();
+  State<InputScreen> createState() => _InputScreenState();
 }
 
-class _AiHumanizerScreenState extends State<AiHumanizerScreen> {
-  final controller = Get.put(AiHumanizerController());
-
-  final TextEditingController _controller = TextEditingController();
+class _InputScreenState extends State<InputScreen> {
+  final controller = Get.put(ApiToolController());
+  final resultController = Get.put(ResultController());
 
   int get wordCount {
-    if (_controller.text.trim().isEmpty) return 0;
-    return _controller.text.trim().split(RegExp(r'\s+')).length;
+    if (controller.inputTextcontroller.text.trim().isEmpty) return 0;
+    return controller.inputTextcontroller.text
+        .trim()
+        .split(RegExp(r'\s+'))
+        .length;
   }
 
   Future<void> _pasteText() async {
     ClipboardData? data = await Clipboard.getData(Clipboard.kTextPlain);
     if (data != null && data.text != null) {
       setState(() {
-        _controller.text = data.text!; // paste text into TextField
+        controller.inputTextcontroller.text =
+            data.text!; // paste text into TextField
       });
     }
   }
@@ -69,12 +75,14 @@ class _AiHumanizerScreenState extends State<AiHumanizerScreen> {
           onPressed: () => Get.back(),
           icon: const Icon(Icons.arrow_back, color: Colors.black),
         ),
-        title: const Text(
-          "AI Humanizer",
-          style: TextStyle(
-            color: Colors.black,
-            fontWeight: FontWeight.w600,
-            fontSize: 18,
+        title: Obx(
+          () => Text(
+            Get.find<HomeController>().toolName.value,
+            style: TextStyle(
+              color: Colors.black,
+              fontWeight: FontWeight.w600,
+              fontSize: 18,
+            ),
           ),
         ),
         centerTitle: false,
@@ -108,7 +116,7 @@ class _AiHumanizerScreenState extends State<AiHumanizerScreen> {
                   children: [
                     Expanded(
                       child: TextField(
-                        controller: _controller,
+                        controller: controller.inputTextcontroller,
                         onChanged: (_) => setState(() {}),
                         maxLines: null,
                         expands: true,
@@ -198,6 +206,7 @@ class _AiHumanizerScreenState extends State<AiHumanizerScreen> {
                   ],
                 ),
               ),
+              // Text('data${Get.find<SummarizerController>().result}'),
             ],
           ),
         ),
@@ -208,22 +217,20 @@ class _AiHumanizerScreenState extends State<AiHumanizerScreen> {
         padding: const EdgeInsets.all(16.0),
         child: GestureDetector(
           onTap:
-              _controller.text.trim().isEmpty
+              controller.inputTextcontroller.text.trim().isEmpty
                   ? null
                   : () {
                     FocusManager.instance.primaryFocus?.unfocus();
-                    // log('tapped');
+                    log('tapped');
 
                     Get.to(() => LoadingScreen());
-                    // Get.to(() => ResultScreenView());
-                    // TODO: Humanizer Logic
                   },
           child: Container(
             height: 46,
             width: double.infinity,
             decoration: BoxDecoration(
               color:
-                  _controller.text.trim().isEmpty
+                  controller.inputTextcontroller.text.trim().isEmpty
                       ? Appcolor.themeColor.withOpacity(0.1)
                       : Appcolor.themeColor,
               borderRadius: BorderRadius.circular(50),
@@ -234,13 +241,15 @@ class _AiHumanizerScreenState extends State<AiHumanizerScreen> {
                 children: [
                   Image.asset(AppImages.flashIcon, height: 24, width: 24),
                   const SizedBox(width: 5),
-                  const Text(
-                    'Make it Humanizer',
-                    style: TextStyle(
-                      fontFamily: AppFonts.roboto,
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500,
-                      color: Colors.white,
+                  Obx(
+                    () => Text(
+                      'Make it ${Get.find<HomeController>().toolName.value.replaceAll("AI ", "")}',
+                      style: TextStyle(
+                        fontFamily: AppFonts.roboto,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.white,
+                      ),
                     ),
                   ),
                 ],

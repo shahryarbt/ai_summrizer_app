@@ -1,10 +1,20 @@
 import 'package:ai_text_summrizer/utils/components/response_config.dart';
 import 'package:ai_text_summrizer/view/splash_view/splash_view.dart';
+import 'package:ai_text_summrizer/view_model/home_controller/home_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import "package:device_preview/device_preview.dart";
 
-void main() {
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
+
+void main() async {
+  // ...
+
+  WidgetsFlutterBinding.ensureInitialized();
+  Get.put(HomeController());
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+
   runApp(
     DevicePreview(
       enabled: false,
