@@ -33,7 +33,7 @@ class ApiToolController extends GetxController {
 
       Get.find<ResultController>().originalText.value = text;
       Get.find<ResultController>().tabIndex.value = 0;
-      Get.find<ResultController>().humanizedText.value = result.value;
+      Get.find<ResultController>().convertedText.value = result.value;
       inputTextcontroller.text = '';
 
       Get.off(() => ResultScreenView(index: index));
@@ -51,30 +51,44 @@ class ApiToolController extends GetxController {
     switch (index) {
       case 0:
         return """
-   You are a text humanizer tool. 
-Your job is to take the input text, detect its language, and rewrite it in a natural, human-like style without changing the meaning. 
+You are an AI summarizer. 
+Summarize the following text in the same language as the input. 
+Do NOT rephrase or rewrite the whole text. 
+Only extract and compress the main points. 
+The summary length must be around 30% of the original text length. 
+If the input is long, write in 2-4 short sentences or bullet points. 
+Always format the output in proper Markdown:
+- Use "-" for bullet points
+- Use **word** for bold emphasis
+- No special symbols like "•"
+Keep it concise and clear, no extra explanations. 
 
-Rules:
-1. Keep the response in the same language as the input.
-2. Preserve or improve formatting using Markdown (headings, bullet points, bold, italics) if it improves readability.
-3. Do not add any explanations or meta text like "Here’s the result". Only return the final rewritten text.
-
-Input text:
- 
-$text
+Text:  $text
 """;
       case 1:
         return """
-You are an AI paraphraser.
-Rephrase the input text creatively while keeping the original message intact.
+You are a paraphrasing tool.  
+Take the input text and return the paraphrased version in the same language as the input.  
+If the paraphrased text naturally requires **bold text** or bullet points, output it in proper Markdown format (so it can be rendered in Flutter Markdown).  
+Keep the response concise and human-friendly, not mechanical.  
+Do not remove or add formatting unless necessary.
+
 
 Input text:
 $text
 """;
       case 2:
         return """
-You are a professional editor.
-Improve the clarity, flow, and grammar of the text without changing meaning.
+You are an AI Humanizer.  
+Rewrite the following text in the same language as the input so it sounds naturally written by a human, not by AI.  
+
+⚠️ Important Instructions:  
+- Keep the original meaning fully intact.  
+- Avoid robotic or repetitive wording.  
+- Add natural flow, variation in sentence length, and casual readability.  
+- Do not add phrases like "Here is the humanized text".  
+- If the text has formatting (bullet points, bold, etc.), keep it in the output.  
+- The output must look like genuine human writing, not AI-generated.  
 
 Input text:
 $text

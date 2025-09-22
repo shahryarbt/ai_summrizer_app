@@ -53,31 +53,65 @@ class BottomSheetWidget extends StatelessWidget {
             );
           }),
           const SizedBox(height: 25),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              minimumSize: const Size(double.infinity, 50),
-              backgroundColor: Appcolor.themeColor,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(56),
+          Obx(() {
+            return ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                minimumSize: const Size(double.infinity, 50),
+                backgroundColor: Appcolor.themeColor,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(56),
+                ),
               ),
-            ),
-            onPressed: () {
-              Get.back();
-              Get.snackbar(
-                "Download",
-                "${controller.selectedFormat.value} selected",
-              );
-            },
-            child: Text(
-              "Download",
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                fontFamily: AppFonts.roboto,
-                color: Colors.white,
+              onPressed:
+                  controller.isSaving.value
+                      ? null
+                      : () async {
+                        if (controller.selectedFormat.value.isNotEmpty) {
+                          final text = controller.originalText.value;
+                          if (controller.selectedFormat.value == 'TXT') {
+                            await controller.saveTextFile(text);
+                            Get.snackbar("Success", "TXT File Downloaded");
+                            Navigator.pop(context);
+                          } else if (controller.selectedFormat.value == "PDF") {
+                            await controller.savePdfFile(text);
+                            Get.snackbar("Success", "PDF File Downloaded");
+                            Navigator.pop(context);
+                          } else if (controller.selectedFormat.value == "DOC") {
+                            await controller.saveDocxFileSimple(text);
+                            Get.snackbar("Success", "DOC File Downloaded");
+                            Navigator.pop(context);
+                          }
+
+                          /// Success/Error snackbar
+                          if (controller.message.value.isNotEmpty) {
+                            Get.snackbar(
+                              "Download",
+                              controller.message.value,
+                              snackPosition: SnackPosition.BOTTOM,
+                              backgroundColor: Colors.black87,
+                              colorText: Colors.white,
+                            );
+
+                            /// success case -> close sheet
+                            if (controller.message.value.contains("✅")) {
+                              Get.back();
+                            }
+                          }
+                        } else {
+                          Get.snackbar("Warning", "Please Select An Format");
+                        }
+                      },
+              child: Text(
+                controller.isSaving.value ? "Downloading..." : "Download",
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  fontFamily: AppFonts.roboto,
+                  color: Colors.white,
+                ),
               ),
-            ),
-          ),
+            );
+          }),
         ],
       ),
     );

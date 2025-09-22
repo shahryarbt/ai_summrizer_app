@@ -8,6 +8,7 @@ import 'package:ai_text_summrizer/view_model/home_controller/home_controller.dar
 import 'package:ai_text_summrizer/view_model/result_controller/result_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_md/flutter_md.dart';
 import 'package:get/get.dart';
 
 class ResultScreenView extends StatefulWidget {
@@ -27,6 +28,11 @@ class _ResultScreenViewState extends State<ResultScreenView>
     return controller.originalText.value.trim().split(RegExp(r'\s+')).length;
   }
 
+  int get wordCount2 {
+    if (controller.convertedText.value.trim().isEmpty) return 0;
+    return controller.convertedText.value.trim().split(RegExp(r'\s+')).length;
+  }
+
   @override
   void initState() {
     // TODO: implement initState
@@ -35,6 +41,11 @@ class _ResultScreenViewState extends State<ResultScreenView>
     //         "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.";
     //    controller. humarizeTextcontroller.text =
     //         "labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.";
+  }
+
+  bool isRTL(String text) {
+    final rtlRegex = RegExp(r'^[\u0590-\u08FF]');
+    return rtlRegex.hasMatch(text.trim());
   }
 
   @override
@@ -139,24 +150,105 @@ class _ResultScreenViewState extends State<ResultScreenView>
                               //   data: controller.originalText.value,
                               // )
                               SingleChildScrollView(
-                                child: Text(
-                                  controller.originalText.value,
-                                  style: TextStyle(
-                                    //     fontFamily: AppFonts.roboto,
-                                    fontWeight: FontWeight.w400,
-                                    color: Colors.black,
-                                    fontSize: 13,
+                                child: MarkdownTheme(
+                                  data: MarkdownThemeData(
+                                    textDirection:
+                                        isRTL(
+                                              controller.originalText
+                                                  .toString(),
+                                            )
+                                            ? TextDirection.rtl
+                                            : TextDirection.ltr,
+                                    // textDirection: TextDirection.rtl,
+                                    // textDirection:
+                                    //     message.text.isRtl
+                                    //         ? TextDirection.rtl
+                                    //         : TextDirection.ltr,
+                                    textStyle: TextStyle(
+                                      color: Colors.black,
+                                      height: 1.35,
+                                      fontWeight: FontWeight.w400,
+                                    ),
+                                    h1Style: TextStyle(
+                                      fontSize: 22.0,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.black,
+                                    ),
+                                    h2Style: TextStyle(
+                                      fontSize: 20.0,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.black,
+                                    ),
+                                    quoteStyle: TextStyle(
+                                      fontSize: 12.0,
+                                      fontStyle: FontStyle.italic,
+                                      color: Colors.black,
+                                    ),
+                                    // Handle link taps
+                                    onLinkTap: (title, url) {
+                                      print('Tapped link: $title -> $url');
+                                    },
+                                    // Filter blocks (e.g., exclude images)
+                                    // blockFilter: (block) => block is! MD$Image,
+                                    // Filter spans (e.g., exclude certain styles)
+                                    spanFilter:
+                                        (span) =>
+                                            !span.style.contains(
+                                              MD$Style.spoiler,
+                                            ),
+                                  ),
+                                  child: MarkdownWidget(
+                                    markdown: Markdown.fromString(
+                                      controller.originalText.toString(),
+                                    ),
                                   ),
                                 ),
+                                // Text(
+                                //   controller.originalText.value,
+                                //   style: TextStyle(
+                                //     //     fontFamily: AppFonts.roboto,
+                                //     fontWeight: FontWeight.w400,
+                                //     color: Colors.black,
+                                //     fontSize: 13,
+                                //   ),
+                                // ),
                               )
                               : SingleChildScrollView(
-                                child: Text(
-                                  controller.humanizedText.value,
-                                  style: TextStyle(
-                                    //     fontFamily: AppFonts.roboto,
-                                    fontWeight: FontWeight.w400,
-                                    color: Colors.black,
-                                    fontSize: 13,
+                                child: MarkdownTheme(
+                                  data: MarkdownThemeData(
+                                    textDirection:
+                                        isRTL(
+                                              controller.convertedText
+                                                  .toString(),
+                                            )
+                                            ? TextDirection.rtl
+                                            : TextDirection.ltr,
+
+                                    textStyle: const TextStyle(
+                                      color: Colors.black,
+                                      height: 1.35,
+                                      fontWeight: FontWeight.w400,
+                                    ),
+                                    h1Style: const TextStyle(
+                                      fontSize: 22.0,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.black,
+                                    ),
+                                    h2Style: const TextStyle(
+                                      fontSize: 20.0,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.black,
+                                    ),
+                                    quoteStyle: const TextStyle(
+                                      fontSize: 12.0,
+                                      fontStyle: FontStyle.italic,
+                                      color: Colors.black,
+                                    ),
+                                  ),
+                                  child: MarkdownWidget(
+                                    markdown: Markdown.fromString(
+                                      controller.convertedText.toString(),
+                                    ),
                                   ),
                                 ),
                               ),
@@ -193,11 +285,15 @@ class _ResultScreenViewState extends State<ResultScreenView>
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(
-                        "$wordCount words",
-                        style: TextStyle(
-                          color: Colors.grey,
-                          fontSize: size.width * 0.035,
+                      Obx(
+                        () => Text(
+                          controller.tabIndex.value == 1
+                              ? "$wordCount2 words"
+                              : "$wordCount words",
+                          style: TextStyle(
+                            color: Colors.grey,
+                            fontSize: size.width * 0.035,
+                          ),
                         ),
                       ),
                       Container(
@@ -211,7 +307,9 @@ class _ResultScreenViewState extends State<ResultScreenView>
                         child: TextButton(
                           onPressed: () {
                             Clipboard.setData(
-                              ClipboardData(text: controller.text.toString()),
+                              ClipboardData(
+                                text: controller.convertedText.toString(),
+                              ),
                             );
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(

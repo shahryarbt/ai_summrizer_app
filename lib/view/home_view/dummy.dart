@@ -1,33 +1,25 @@
-import 'package:get/get.dart';
+import 'package:flutter/material.dart';
 import 'package:media_store_plus/media_store_plus.dart';
 import 'dart:io';
 import 'package:path_provider/path_provider.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
+import 'package:docx_template/docx_template.dart'; // add in pubspec.yaml
+import 'package:flutter/services.dart' show rootBundle;
+
 import 'package:archive/archive.dart';
 
-class ResultController extends GetxController {
-  final originalText = ''.obs;
-  final convertedText = ''.obs;
-  final tabIndex = 0.obs;
-  var selectedFormat = "".obs;
+class TextToFileScreen extends StatefulWidget {
+  @override
+  _TextToFileScreenState createState() => _TextToFileScreenState();
+}
 
-  /// Loader state
-  var isSaving = false.obs;
+class _TextToFileScreenState extends State<TextToFileScreen> {
+  TextEditingController _textController = TextEditingController();
+  String _message = '';
 
-  /// Status message (success/error)
-  var message = "".obs;
-
-  void selectFormat(String format) {
-    selectedFormat.value = format;
-  }
-
-  /// Save TXT File
   Future<void> saveTextFile(String text) async {
     try {
-      isSaving.value = true;
-      message.value = "";
-
       await MediaStore.ensureInitialized();
       MediaStore.appFolder = "ai_text_writer";
 
@@ -44,22 +36,18 @@ class ResultController extends GetxController {
         relativePath: "ai_text_writer/TextFiles",
       );
 
-      if (await tempFile.exists()) await tempFile.delete();
+      if (await tempFile.exists()) {
+        await tempFile.delete();
+      }
 
-      message.value = "✅ TXT file saved successfully!";
+      print("✅ TXT file saved successfully!");
     } catch (e) {
-      message.value = "❌ TXT Error: $e";
-    } finally {
-      isSaving.value = false;
+      print("❌ TXT Error: $e");
     }
   }
 
-  /// Save PDF File
   Future<void> savePdfFile(String text) async {
     try {
-      isSaving.value = true;
-      message.value = "";
-
       await MediaStore.ensureInitialized();
       MediaStore.appFolder = "ai_text_writer";
 
@@ -90,22 +78,68 @@ class ResultController extends GetxController {
         relativePath: "ai_text_writer/PdfFiles",
       );
 
-      if (await tempFile.exists()) await tempFile.delete();
+      if (await tempFile.exists()) {
+        await tempFile.delete();
+      }
 
-      message.value = "✅ PDF file saved successfully!";
+      print("✅ PDF file saved successfully!");
     } catch (e) {
-      message.value = "❌ PDF Error: $e";
-    } finally {
-      isSaving.value = false;
+      print("❌ PDF Error: $e");
     }
   }
 
-  /// Save DOCX File
+  bool _isRTL(String text) {
+    final rtlChars = RegExp(r'[\u0600-\u06FF]');
+    return rtlChars.hasMatch(text);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text('Text to File')),
+      body: Padding(
+        padding: EdgeInsets.all(16.0),
+        child: Column(
+          children: [
+            TextField(
+              controller: _textController,
+              maxLines: 5,
+              decoration: InputDecoration(
+                hintText: 'Enter your text here...',
+                border: OutlineInputBorder(),
+              ),
+            ),
+            SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: () {
+                saveTextFile(_textController.text.toString());
+              },
+              child: Text('Save as TXT'),
+            ),
+            SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: () {
+                savePdfFile(_textController.text.toString());
+              },
+              child: Text('Save as PDF'),
+            ),
+            SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: () {
+                saveDocxFileSimple(_textController.text);
+              },
+              child: Text('Save as DOCX'),
+            ),
+            SizedBox(height: 16),
+            Text(_message),
+          ],
+        ),
+      ),
+    );
+  }
+
   Future<void> saveDocxFileSimple(String text) async {
     try {
-      isSaving.value = true;
-      message.value = "";
-
       await MediaStore.ensureInitialized();
       MediaStore.appFolder = "ai_text_writer";
 
@@ -113,6 +147,7 @@ class ResultController extends GetxController {
       final fileName = "text_${DateTime.now().millisecondsSinceEpoch}.docx";
       final tempFile = File('${tempDir.path}/$fileName');
 
+      // Create DOCX content
       final docxBytes = await _createSimpleDocx(text);
       await tempFile.writeAsBytes(docxBytes);
 
@@ -123,26 +158,24 @@ class ResultController extends GetxController {
         relativePath: "ai_text_writer/DocxFiles",
       );
 
-      if (await tempFile.exists()) await tempFile.delete();
+      if (await tempFile.exists()) {
+        await tempFile.delete();
+      }
 
-      message.value = "✅ DOCX file saved successfully!";
+      setState(() {
+        _message = "✅ DOCX file saved successfully!";
+      });
     } catch (e) {
-      message.value = "❌ DOCX Error: $e";
-    } finally {
-      isSaving.value = false;
+      setState(() {
+        _message = "❌ DOCX Error: $e";
+      });
     }
   }
 
-  /// Utility: Check RTL text
-  bool _isRTL(String text) {
-    final rtlChars = RegExp(r'[\u0600-\u06FF]');
-    return rtlChars.hasMatch(text);
-  }
-
-  /// Create simple DOCX from text
   Future<List<int>> _createSimpleDocx(String text) async {
     final archive = Archive();
 
+    // [Content_Types].xml
     final contentTypes =
         '''<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">
@@ -158,12 +191,14 @@ class ResultController extends GetxController {
       ),
     );
 
+    // _rels/.rels
     final rels = '''<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
 <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/>
 </Relationships>''';
     archive.addFile(ArchiveFile('_rels/.rels', rels.length, rels.codeUnits));
 
+    // word/document.xml
     final document = '''<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
 <w:body>
@@ -180,4 +215,7 @@ class ResultController extends GetxController {
 
     return ZipEncoder().encode(archive)!;
   }
+
+  // pubspec.yaml mein ye dependency add karein:
+  // archive: ^3.4.9
 }

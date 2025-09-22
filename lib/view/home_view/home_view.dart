@@ -1,6 +1,7 @@
 import 'package:ai_text_summrizer/utils/components/app_colors.dart';
 import 'package:ai_text_summrizer/utils/components/app_images.dart';
 import 'package:ai_text_summrizer/utils/fonts/app_fonts.dart';
+import 'package:ai_text_summrizer/view/home_view/dummy.dart';
 import 'package:ai_text_summrizer/view/input_view/input_screen_view.dart';
 import 'package:ai_text_summrizer/view/pro_screen/pro_screen1.dart';
 import 'package:ai_text_summrizer/view_model/api_request_tool_controller/api_request_tool_controller.dart';
@@ -45,6 +46,13 @@ class _HomeScreenState extends State<HomeScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            TextButton(
+              onPressed: () {
+                Get.to(() => TextToFileScreen());
+              },
+              child: Text('Dummy'),
+            ),
+
             /// Top Banner with Gradient
             ///
             Stack(
