@@ -1,3 +1,4 @@
+import 'package:ai_text_summrizer/services/adManager.dart';
 import 'package:ai_text_summrizer/utils/components/app_colors.dart';
 import 'package:ai_text_summrizer/utils/components/app_images.dart';
 import 'package:ai_text_summrizer/utils/fonts/app_fonts.dart';
@@ -35,6 +36,22 @@ class _HomeScreenState extends State<HomeScreen> {
       "subtitle": "Make AI text sound more human",
     },
   ];
+  bool isBannerReady = false;
+
+  @override
+  void initState() {
+    super.initState();
+    AdsManager.loadBannerAd(
+      onAdLoaded: () => setState(() => isBannerReady = true),
+      onAdFailed: () => setState(() => isBannerReady = false),
+    );
+  }
+
+  @override
+  void dispose() {
+    AdsManager.disposeBanner();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -46,13 +63,6 @@ class _HomeScreenState extends State<HomeScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            TextButton(
-              onPressed: () {
-                Get.to(() => TextToFileScreen());
-              },
-              child: Text('Dummy'),
-            ),
-
             /// Top Banner with Gradient
             ///
             Stack(
@@ -178,6 +188,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     },
                   ),
                 ),
+
                 Positioned(
                   top: Get.height * 0.12,
                   left: 20,
@@ -272,9 +283,43 @@ class _HomeScreenState extends State<HomeScreen> {
             //     },
             //   ),
             // ),
+            if (isBannerReady) AdsManager.getBannerAdWidget(),
+            TextButton(
+              onPressed: () async {
+                AdsManager.loadInterstitialAd(
+                  onAdLoaded: () => setState(() => isInterstitialReady = true),
+                  onAdFailed: () => setState(() => isInterstitialReady = false),
+                );
+                if (isInterstitialReady) {
+                  _showInterstitial();
+                }
+              },
+              child: Text('Show intersital add'),
+            ),
+            // TextButton(
+            //   onPressed: () {
+            //     Get.to(() => NativeAdScreen());
+            //   },
+            //   child: Text('Go to view native ad'),
+            // ),
+            NativeAdWidget(),
           ],
         ),
       ),
+    );
+  }
+
+  bool isInterstitialReady = false;
+  void _showInterstitial() {
+    AdsManager.showInterstitialAd(
+      onAdDismissed: () {
+        setState(() => isInterstitialReady = false);
+        // Reload again after dismissal
+        AdsManager.loadInterstitialAd(
+          onAdLoaded: () => setState(() => isInterstitialReady = true),
+          onAdFailed: () => setState(() => isInterstitialReady = false),
+        );
+      },
     );
   }
 }
