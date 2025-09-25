@@ -5,6 +5,7 @@ import 'package:ai_text_summrizer/utils/components/app_images.dart';
 import 'package:ai_text_summrizer/utils/components/response_config.dart';
 import 'package:ai_text_summrizer/utils/fonts/app_fonts.dart';
 import 'package:ai_text_summrizer/view/bottom_bar_view/bottom_bar_view.dart';
+import 'package:ai_text_summrizer/view/home_view/dummy.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -206,7 +207,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                 color: Colors.grey[300],
                 width: double.infinity,
                 // alignment: Alignment.center,
-                child: Image.asset(AppImages.nativeAd, fit: BoxFit.cover),
+                child: NativeAdWidget(),
               ),
               // Ad space
             ],

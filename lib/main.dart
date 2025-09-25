@@ -1,6 +1,8 @@
+import 'package:ai_text_summrizer/services/adManager.dart';
 import 'package:ai_text_summrizer/utils/components/response_config.dart';
 import 'package:ai_text_summrizer/view/splash_view/splash_view.dart';
 import 'package:ai_text_summrizer/view_model/home_controller/home_controller.dart';
+import 'package:ai_text_summrizer/view_model/splash_controller/splash_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import "package:device_preview/device_preview.dart";
@@ -13,8 +15,10 @@ void main() async {
   // ...
 
   WidgetsFlutterBinding.ensureInitialized();
+
   await MobileAds.instance.initialize();
   Get.put(HomeController());
+  Get.put(SplashController());
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
   runApp(

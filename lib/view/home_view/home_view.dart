@@ -41,15 +41,15 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    AdsManager.loadBannerAd(
-      onAdLoaded: () => setState(() => isBannerReady = true),
-      onAdFailed: () => setState(() => isBannerReady = false),
-    );
+    // AdsManager.loadBannerAd(
+    //   onAdLoaded: () => setState(() => isBannerReady = true),
+    //   onAdFailed: () => setState(() => isBannerReady = false),
+    // );
   }
 
   @override
   void dispose() {
-    AdsManager.disposeBanner();
+    // AdsManager.disposeBanner();
     super.dispose();
   }
 
@@ -205,103 +205,26 @@ class _HomeScreenState extends State<HomeScreen> {
               ],
             ),
 
-            // Expanded(
-            //   child: ListView.builder(
-            //     padding: const EdgeInsets.all(16),
-            //     itemCount: features.length,
-            //     itemBuilder: (context, index) {
-            //       final item = features[index];
-
-            //       // Gradient direction alternate hoga
-            //       final Alignment begin =
-            //           index.isEven
-            //               ? Alignment.centerLeft
-            //               : Alignment.centerRight;
-            //       final Alignment end =
-            //           index.isEven
-            //               ? Alignment.centerRight
-            //               : Alignment.centerLeft;
-
-            //       return GestureDetector(
-            //         onTap: () {},
-            //         child: Container(
-            //           margin: const EdgeInsets.only(top: 8),
-            //           decoration: BoxDecoration(
-            //             gradient: LinearGradient(
-            //               colors: [
-            //                 Appcolor.themeColor.withOpacity(0.4),
-            //                 Colors.transparent,
-            //               ],
-            //               begin: begin,
-            //               end: end,
-            //             ),
-            //             borderRadius: BorderRadius.circular(16),
-            //           ),
-            //           child: Container(
-            //             padding: EdgeInsets.symmetric(vertical: 5),
-            //             margin: const EdgeInsets.all(1.5), // border thickness
-            //             decoration: BoxDecoration(
-            //               color: Colors.white,
-            //               borderRadius: BorderRadius.circular(14),
-            //             ),
-            //             child: ListTile(
-            //               leading: Container(
-            //                 padding: const EdgeInsets.all(14),
-            //                 decoration: BoxDecoration(
-            //                   borderRadius: BorderRadius.circular(12),
-            //                   color: Appcolor.themeColor.withOpacity(0.1),
-            //                 ),
-            //                 child: Image.asset(item['icon'], height: 26),
-            //               ),
-            //               title: Text(
-            //                 item["title"],
-            //                 style: TextStyle(
-            //                   fontFamily: AppFonts.roboto,
-            //                   fontWeight: FontWeight.w600,
-            //                   fontSize: 16,
-            //                 ),
-            //               ),
-            //               subtitle: Text(
-            //                 item["subtitle"],
-            //                 style: TextStyle(
-            //                   fontSize: 12,
-            //                   fontFamily: AppFonts.roboto,
-            //                   color: Color(0xff5E626C),
-            //                 ),
-            //               ),
-            //               trailing: const Icon(
-            //                 Icons.arrow_forward_ios,
-            //                 size: 16,
-            //               ),
-            //               onTap: () {
-            //                 Get.to(() => AiHumanizerScreen());
-            //               },
-            //             ),
-            //           ),
-            //         ),
-            //       );
-            //     },
-            //   ),
+            // if (isBannerReady) AdsManager.getBannerAdWidget(),
+            // TextButton(
+            //   onPressed: () async {
+            //     AdsManager.loadInterstitialAd(
+            //       onAdLoaded: () => setState(() => isInterstitialReady = true),
+            //       onAdFailed: () => setState(() => isInterstitialReady = false),
+            //     );
+            //     if (isInterstitialReady) {
+            //       _showInterstitial();
+            //     }
+            //   },
+            //   child: Text('Show intersital add'),
             // ),
-            if (isBannerReady) AdsManager.getBannerAdWidget(),
-            TextButton(
-              onPressed: () async {
-                AdsManager.loadInterstitialAd(
-                  onAdLoaded: () => setState(() => isInterstitialReady = true),
-                  onAdFailed: () => setState(() => isInterstitialReady = false),
-                );
-                if (isInterstitialReady) {
-                  _showInterstitial();
-                }
-              },
-              child: Text('Show intersital add'),
-            ),
             // TextButton(
             //   onPressed: () {
             //     Get.to(() => NativeAdScreen());
             //   },
             //   child: Text('Go to view native ad'),
             // ),
+          
             NativeAdWidget(),
           ],
         ),
@@ -310,16 +233,16 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   bool isInterstitialReady = false;
-  void _showInterstitial() {
-    AdsManager.showInterstitialAd(
-      onAdDismissed: () {
-        setState(() => isInterstitialReady = false);
-        // Reload again after dismissal
-        AdsManager.loadInterstitialAd(
-          onAdLoaded: () => setState(() => isInterstitialReady = true),
-          onAdFailed: () => setState(() => isInterstitialReady = false),
-        );
-      },
-    );
-  }
+  // void _showInterstitial() {
+  //   AdsManager.showInterstitialAd(
+  //     onAdDismissed: () {
+  //       setState(() => isInterstitialReady = false);
+  //       // Reload again after dismissal
+  //       AdsManager.loadInterstitialAd(
+  //         onAdLoaded: () => setState(() => isInterstitialReady = true),
+  //         onAdFailed: () => setState(() => isInterstitialReady = false),
+  //       );
+  //     },
+  //   );
+  // }
 }
