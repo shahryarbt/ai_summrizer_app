@@ -1,4 +1,5 @@
 import 'package:ai_text_summrizer/services/adManager.dart';
+import 'package:ai_text_summrizer/services/remote_config_service.dart';
 import 'package:ai_text_summrizer/utils/components/response_config.dart';
 import 'package:ai_text_summrizer/view/splash_view/splash_view.dart';
 import 'package:ai_text_summrizer/view_model/home_controller/home_controller.dart';
@@ -17,10 +18,11 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   await MobileAds.instance.initialize();
+
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   Get.put(HomeController());
   Get.put(SplashController());
-  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-
+  RemoteConfigService().init();
   runApp(
     DevicePreview(
       enabled: false,

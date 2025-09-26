@@ -101,6 +101,11 @@ class AdManager {
     );
   }
 
+  static void disposeInterstitial() {
+    interstitialAd?.dispose();
+    interstitialAd = null;
+  }
+
   /// Show Interstitial Ad
   static void showInterstitialAd({
     Function? onDismiss,
@@ -145,8 +150,8 @@ class AdManager {
       adUnitId: AdIds.nativeAdId, // ✅ test id
       factoryId:
           Platform.isAndroid
-              ? "listTileLarge"
-              : "listTileLarge", // ye zaroori hai (UI banane ke liye)
+              ? "listTileMedium"
+              : "listTileMedium", // ye zaroori hai (UI banane ke liye)
       request: const AdRequest(),
       // ✅ Selection ke hisaab se bhej do
 
@@ -246,56 +251,54 @@ class AdManager {
     appOpenAd = null;
   }
 
-  /// Loads a BannerAd and returns the BannerAd object.
-  static Future<void> loadBannerAd({
-    void Function(BannerAd?)? onAdLoaded,
-    void Function(LoadAdError)? onAdFailedToLoad,
-  }) async {
-    final AnchoredAdaptiveBannerAdSize? size =
-        await AdSize.getAnchoredAdaptiveBannerAdSize(
-          Orientation.portrait,
-          Get.width.truncate(),
-        );
-    if (size == null) {
-      // Could not get adaptive size
-      return null;
-    }
-    // if (Get.find<ProScreenController>().isUserPro.value) {
-    //   log("🚫 Pro user hai → banner show skip");
-    //   onAdFailedToLoad;
-    //   return;
-    // }
+  static BannerAd? _bannerAd;
+  static bool _isAdLoaded = false;
 
-    BannerAd? bannerAd;
-    bannerAd = BannerAd(
-      adUnitId: AdIds.bannerAdIdId,
-      size: size,
+  /// Load banner ad
+  static void loadBannerAd({required BuildContext context}) {
+    // Agar already loaded hai to reload mat karo
+    if (_bannerAd != null) return;
+
+    _bannerAd = BannerAd(
+      adUnitId: 'ca-app-pub-3940256099942544/6300978111', // Test ID
+      size: AdSize.banner,
       request: const AdRequest(),
       listener: BannerAdListener(
-        onAdLoaded: (Ad ad) {
-          onAdLoaded?.call(bannerAd);
-          log('banner add loaded');
+        onAdLoaded: (ad) {
+          _isAdLoaded = true;
+          debugPrint("✅ Banner Loaded");
         },
-        onAdFailedToLoad: (Ad ad, LoadAdError error) {
-          log('banner ad failed to loaded');
-          // ad.dispose();
+        onAdFailedToLoad: (ad, error) {
+          _isAdLoaded = false;
+          ad.dispose();
+          _bannerAd = null;
+          debugPrint("❌ Banner Failed: $error");
         },
       ),
     );
-    bannerAd.load();
+
+    _bannerAd!.load();
   }
 
-  /// Returns a widget to display the given BannerAd.
-  static Widget getBannerAdWidget(
-    BannerAd bannerAd, {
-    Alignment alignment = Alignment.center,
-  }) {
+  /// Widget to show banner
+  static Widget getBannerWidget() {
+    if (_bannerAd == null || !_isAdLoaded) {
+      return const SizedBox.shrink();
+    }
+
     return Container(
-      alignment: alignment,
-      width: bannerAd.size.width.toDouble(),
-      height: bannerAd.size.height.toDouble(),
-      child: AdWidget(ad: bannerAd),
+      alignment: Alignment.center,
+      width: _bannerAd!.size.width.toDouble(),
+      height: _bannerAd!.size.height.toDouble(),
+      child: AdWidget(ad: _bannerAd!),
     );
+  }
+
+  /// Dispose banner
+  static void disposeBanner() {
+    _bannerAd?.dispose();
+    _bannerAd = null;
+    _isAdLoaded = false;
   }
 }
 

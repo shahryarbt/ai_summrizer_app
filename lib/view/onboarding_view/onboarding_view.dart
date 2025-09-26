@@ -1,5 +1,7 @@
 import 'dart:developer';
 
+import 'package:ai_text_summrizer/services/adManager.dart';
+import 'package:ai_text_summrizer/services/remote_config_service.dart';
 import 'package:ai_text_summrizer/utils/components/app_colors.dart';
 import 'package:ai_text_summrizer/utils/components/app_images.dart';
 import 'package:ai_text_summrizer/utils/components/response_config.dart';
@@ -48,6 +50,9 @@ class _OnboardingScreenState extends State<OnboardingScreen>
   @override
   void initState() {
     super.initState();
+
+    AdManager.loadBannerAd(context: context);
+
     _fadeController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 800),
@@ -202,13 +207,16 @@ class _OnboardingScreenState extends State<OnboardingScreen>
               ),
 
               // const SizedBox(height: 20),
-              Container(
-                // height: SizeConfig,
-                color: Colors.grey[300],
-                width: double.infinity,
-                // alignment: Alignment.center,
-                child: NativeAdWidget(),
-              ),
+              RemoteConfigService().onboarding_native_OR_banner == 0
+                  ? AdManager.getBannerWidget()
+                  : Container(
+                    height: 240,
+                    // height: SizeConfig,
+                    color: Colors.grey[300],
+                    width: double.infinity,
+                    // alignment: Alignment.center,
+                    child: NativeAdWidget(),
+                  ),
               // Ad space
             ],
           ),

@@ -18,7 +18,7 @@ class _NativeAdWidgetState extends State<NativeAdWidget> {
     _loadAd();
   }
 
-  void _loadAd() {
+  void _loadAd() {  
     _nativeAd = NativeAd(
       adUnitId: 'ca-app-pub-3940256099942544/2247696110', // ✅ Test Native Ad ID
       factoryId: 'listTileLarge', // ✅ same as MainActivity.kt
@@ -42,9 +42,9 @@ class _NativeAdWidgetState extends State<NativeAdWidget> {
   Widget build(BuildContext context) {
     return _isLoaded
         ? Container(
-          color: Colors.white,
+          // color: Colors.white,
           // height: 100,
-          height: 450,
+          height: 234,
           width: double.infinity,
           alignment: Alignment.center,
           child: AdWidget(ad: _nativeAd!),

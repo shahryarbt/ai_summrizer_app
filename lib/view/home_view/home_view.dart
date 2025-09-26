@@ -1,4 +1,5 @@
 import 'package:ai_text_summrizer/services/adManager.dart';
+import 'package:ai_text_summrizer/services/remote_config_service.dart';
 import 'package:ai_text_summrizer/utils/components/app_colors.dart';
 import 'package:ai_text_summrizer/utils/components/app_images.dart';
 import 'package:ai_text_summrizer/utils/fonts/app_fonts.dart';
@@ -9,6 +10,7 @@ import 'package:ai_text_summrizer/view_model/api_request_tool_controller/api_req
 import 'package:ai_text_summrizer/view_model/home_controller/home_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -19,6 +21,7 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   ApiToolController _aihumnazierController = Get.put(ApiToolController());
+  HomeController _homeController = Get.find<HomeController>();
   final List<Map<String, dynamic>> features = [
     {
       "icon": AppImages.ai_summarizer,
@@ -41,15 +44,12 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    // AdsManager.loadBannerAd(
-    //   onAdLoaded: () => setState(() => isBannerReady = true),
-    //   onAdFailed: () => setState(() => isBannerReady = false),
-    // );
+    AdManager.loadBannerAd(context: context);
   }
 
   @override
   void dispose() {
-    // AdsManager.disposeBanner();
+    AdManager.disposeBanner();
     super.dispose();
   }
 
@@ -60,173 +60,179 @@ class _HomeScreenState extends State<HomeScreen> {
 
       /// APP BAR LIKE TOP BANNER
       body: SafeArea(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            /// Top Banner with Gradient
-            ///
-            Stack(
-              children: [
-                Container(
-                  height: Get.height * 0.25,
-                  width: double.infinity,
-                  color: Colors.white, // tumhara background
-                  child: Transform.translate(
-                    offset: const Offset(130, -50), // x=right shift, y=up shift
-                    child: Image.asset(
-                      AppImages.homeScgif,
-                      height: 300,
-                      fit: BoxFit.cover,
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              /// Top Banner with Gradient
+              ///
+              Stack(
+                children: [
+                  Container(
+                    height: Get.height * 0.25,
+                    width: double.infinity,
+                    color: Colors.white, // tumhara background
+                    child: Transform.translate(
+                      offset: const Offset(
+                        130,
+                        -50,
+                      ), // x=right shift, y=up shift
+                      child: Image.asset(
+                        AppImages.homeScgif,
+                        height: 300,
+                        fit: BoxFit.cover,
+                      ),
                     ),
                   ),
-                ),
-                Positioned(
-                  top: Get.height * 0.04,
-                  left: 20,
-                  child: GestureDetector(
-                    onTap: () {
-                      Get.to(() => ProScreen());
-                    },
-                    child: Container(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 15,
-                        vertical: 8,
-                      ),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(20),
-                        gradient: LinearGradient(
-                          colors: [Color(0xffB425E2), Color(0xffE8888D)],
+                  Positioned(
+                    top: Get.height * 0.04,
+                    left: 20,
+                    child: GestureDetector(
+                      onTap: () {
+                        Get.to(() => ProScreen());
+                      },
+                      child: Container(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 15,
+                          vertical: 8,
                         ),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(20),
+                          gradient: LinearGradient(
+                            colors: [Color(0xffB425E2), Color(0xffE8888D)],
+                          ),
+                        ),
+                        child: Image.asset(AppImages.pro, height: 18),
                       ),
-                      child: Image.asset(AppImages.pro, height: 18),
                     ),
                   ),
-                ),
-                const SizedBox(height: 4),
+                  const SizedBox(height: 4),
 
-                Padding(
-                  padding: EdgeInsets.only(top: Get.height * 0.19),
-                  child: ListView.builder(
-                    padding: const EdgeInsets.all(16),
-                    itemCount: features.length,
-                    shrinkWrap: true,
-                    itemBuilder: (context, index) {
-                      final item = features[index];
+                  Padding(
+                    padding: EdgeInsets.only(top: Get.height * 0.19),
+                    child: ListView.builder(
+                      padding: const EdgeInsets.all(16),
+                      itemCount: features.length,
+                      shrinkWrap: true,
+                      itemBuilder: (context, index) {
+                        final item = features[index];
 
-                      // Gradient direction alternate hoga
-                      final Alignment begin =
-                          index.isEven
-                              ? Alignment.centerLeft
-                              : Alignment.centerRight;
-                      final Alignment end =
-                          index.isEven
-                              ? Alignment.centerRight
-                              : Alignment.centerLeft;
+                        // Gradient direction alternate hoga
+                        final Alignment begin =
+                            index.isEven
+                                ? Alignment.centerLeft
+                                : Alignment.centerRight;
+                        final Alignment end =
+                            index.isEven
+                                ? Alignment.centerRight
+                                : Alignment.centerLeft;
 
-                      return GestureDetector(
-                        onTap: () {},
-                        child: Container(
-                          margin: const EdgeInsets.only(top: 8),
-                          decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              colors: [
-                                Appcolor.themeColor.withOpacity(0.4),
-                                Colors.transparent,
-                              ],
-                              begin: begin,
-                              end: end,
-                            ),
-                            borderRadius: BorderRadius.circular(16),
-                          ),
+                        return GestureDetector(
+                          onTap: () {},
                           child: Container(
-                            padding: EdgeInsets.symmetric(vertical: 5),
-                            margin: const EdgeInsets.all(
-                              1.5,
-                            ), // border thickness
+                            margin: const EdgeInsets.only(top: 8),
                             decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(14),
+                              gradient: LinearGradient(
+                                colors: [
+                                  Appcolor.themeColor.withOpacity(0.4),
+                                  Colors.transparent,
+                                ],
+                                begin: begin,
+                                end: end,
+                              ),
+                              borderRadius: BorderRadius.circular(16),
                             ),
-                            child: ListTile(
-                              leading: Container(
-                                padding: const EdgeInsets.all(14),
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(12),
-                                  color: Appcolor.themeColor.withOpacity(0.1),
+                            child: Container(
+                              padding: EdgeInsets.symmetric(vertical: 5),
+                              margin: const EdgeInsets.all(
+                                1.5,
+                              ), // border thickness
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(14),
+                              ),
+                              child: ListTile(
+                                leading: Container(
+                                  padding: const EdgeInsets.all(14),
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(12),
+                                    color: Appcolor.themeColor.withOpacity(0.1),
+                                  ),
+                                  child: Image.asset(item['icon'], height: 26),
                                 ),
-                                child: Image.asset(item['icon'], height: 26),
-                              ),
-                              title: Text(
-                                item["title"],
-                                style: TextStyle(
-                                  fontFamily: AppFonts.roboto,
-                                  fontWeight: FontWeight.w600,
-                                  fontSize: 16,
+                                title: Text(
+                                  item["title"],
+                                  style: TextStyle(
+                                    fontFamily: AppFonts.roboto,
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 16,
+                                  ),
                                 ),
-                              ),
-                              subtitle: Text(
-                                item["subtitle"],
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  fontFamily: AppFonts.roboto,
-                                  color: Color(0xff5E626C),
+                                subtitle: Text(
+                                  item["subtitle"],
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    fontFamily: AppFonts.roboto,
+                                    color: Color(0xff5E626C),
+                                  ),
                                 ),
+                                trailing: const Icon(
+                                  Icons.arrow_forward_ios,
+                                  size: 16,
+                                ),
+                                onTap: () {
+                                  Get.find<HomeController>().toolName.value =
+                                      item["title"];
+                                  Get.to(() => InputScreen());
+                                },
                               ),
-                              trailing: const Icon(
-                                Icons.arrow_forward_ios,
-                                size: 16,
-                              ),
-                              onTap: () {
-                                Get.find<HomeController>().toolName.value =
-                                    item["title"];
-                                Get.to(() => InputScreen());
-                              },
                             ),
                           ),
-                        ),
-                      );
-                    },
-                  ),
-                ),
-
-                Positioned(
-                  top: Get.height * 0.12,
-                  left: 20,
-                  child: Text(
-                    "Summarize, simplify,\nstay focused",
-                    style: const TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      // color: Colors.white,
-                      height: 1.3,
+                        );
+                      },
                     ),
                   ),
-                ),
-              ],
-            ),
 
-            // if (isBannerReady) AdsManager.getBannerAdWidget(),
-            // TextButton(
-            //   onPressed: () async {
-            //     AdsManager.loadInterstitialAd(
-            //       onAdLoaded: () => setState(() => isInterstitialReady = true),
-            //       onAdFailed: () => setState(() => isInterstitialReady = false),
-            //     );
-            //     if (isInterstitialReady) {
-            //       _showInterstitial();
-            //     }
-            //   },
-            //   child: Text('Show intersital add'),
-            // ),
-            // TextButton(
-            //   onPressed: () {
-            //     Get.to(() => NativeAdScreen());
-            //   },
-            //   child: Text('Go to view native ad'),
-            // ),
-          
-            NativeAdWidget(),
-          ],
+                  Positioned(
+                    top: Get.height * 0.12,
+                    left: 20,
+                    child: Text(
+                      "Summarize, simplify,\nstay focused",
+                      style: const TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        // color: Colors.white,
+                        height: 1.3,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+
+              // if (isBannerReady) AdsManager.getBannerAdWidget(),
+              // TextButton(
+              //   onPressed: () async {
+              //     AdsManager.loadInterstitialAd(
+              //       onAdLoaded: () => setState(() => isInterstitialReady = true),
+              //       onAdFailed: () => setState(() => isInterstitialReady = false),
+              //     );
+              //     if (isInterstitialReady) {
+              //       _showInterstitial();
+              //     }
+              //   },
+              //   child: Text('Show intersital add'),
+              // ),
+              // TextButton(
+              //   onPressed: () {
+              //     Get.to(() => NativeAdScreen());
+              //   },
+              //   child: Text('Go to view native ad'),
+              // ),
+              RemoteConfigService().home_screen_ad_native_Or_banner == 0
+                  ? AdManager.getBannerWidget()
+                  : NativeAdWidget(),
+            ],
+          ),
         ),
       ),
     );

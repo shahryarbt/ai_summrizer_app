@@ -1,6 +1,8 @@
 import 'dart:developer';
 import 'dart:io';
 
+import 'package:ai_text_summrizer/services/adManager.dart';
+import 'package:ai_text_summrizer/services/remote_config_service.dart';
 import 'package:ai_text_summrizer/utils/components/app_colors.dart';
 import 'package:ai_text_summrizer/utils/components/app_images.dart';
 import 'package:ai_text_summrizer/utils/fonts/app_fonts.dart';
@@ -11,6 +13,7 @@ import 'package:ai_text_summrizer/view_model/result_controller/result_controller
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:image_picker/image_picker.dart';
 
 // class AiHumanizerController extends GetxController {
@@ -47,7 +50,8 @@ class _InputScreenState extends State<InputScreen> {
   }
 
   File? _file;
-
+  NativeAd? _nativeAd;
+  bool _isLoaded = false;
   Future<void> _pickImage() async {
     final ImagePicker picker = ImagePicker();
     final XFile? pickedFile = await picker.pickImage(
@@ -59,6 +63,41 @@ class _InputScreenState extends State<InputScreen> {
         _file = File(pickedFile.path);
       });
     }
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+
+    AdManager.loadBannerAd(context: context);
+    _loadAd();
+  }
+
+  void _loadAd() {
+    _nativeAd = NativeAd(
+      adUnitId: 'ca-app-pub-3940256099942544/2247696110', // ✅ Test Native Ad ID
+      factoryId: 'listTileMedium', // ✅ same as MainActivity.kt
+      // factoryId: 'listTileMedium', // ✅ same as MainActivity.kt
+      request: const AdRequest(),
+      listener: NativeAdListener(
+        onAdLoaded: (ad) {
+          setState(() {
+            _isLoaded = true;
+          });
+        },
+        onAdFailedToLoad: (ad, error) {
+          ad.dispose();
+          print('Failed to load native ad: $error');
+        },
+      ),
+    )..load();
+  }
+
+  @override
+  void dispose() {
+    AdManager.disposeBanner();
+    super.dispose();
   }
 
   @override
@@ -101,6 +140,14 @@ class _InputScreenState extends State<InputScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
+              RemoteConfigService().input_screen_native_OR_banner == 0
+                  ? Column(
+                    children: [
+                      AdManager.getBannerWidget(),
+                      SizedBox(height: 10),
+                    ],
+                  )
+                  : SizedBox.shrink(),
               // Text Area
               Container(
                 height: size.height * 0.48,
@@ -206,7 +253,21 @@ class _InputScreenState extends State<InputScreen> {
                   ],
                 ),
               ),
+              SizedBox(height: 10),
+
               // Text('data${Get.find<SummarizerController>().result}'),
+              RemoteConfigService().input_screen_native_OR_banner == 1
+                  ? _isLoaded
+                      ? Container(
+                        // color: Colors.white,
+                        // height: 100,
+                        height: 234,
+                        width: double.infinity,
+                        alignment: Alignment.center,
+                        child: AdWidget(ad: _nativeAd!),
+                      )
+                      : const SizedBox.shrink()
+                  : SizedBox.shrink(),
             ],
           ),
         ),
